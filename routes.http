@@ -1,0 +1,28 @@
+POST http://localhost:3333/user/register
+Content-Type: application/json
+
+{
+    "name":"Joao Victor Viera",
+    "cpf":"123.123.123-44",
+    "phone":"(31)996066511",
+    "email": "Test@gmail.com",
+    "password":"pass123"
+}
+
+###
+GET http://localhost:3333/user
+
+###
+GET http://localhost:3333/test
+
+###
+
+POST http://localhost:3333/user/login
+Content-Type: application/json
+
+{
+    "email": "Test@gmail.com",
+    "password":"pass123"
+}
+
+###
