@@ -1,21 +1,30 @@
 import express, { Request, Response, NextFunction } from "express";
+import crypto from "crypto";  
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import auth from "../middleware/auth";
-import normalizeEmail from "../middleware/normalizeEmail";
+import uploadFile from "../middleware/uploadFile";
+
 
 const prisma = new PrismaClient();
 const saltRounds = 10;
 
 const userRouter = express.Router();
 
+// GET Routes
 
 userRouter.get("/auth", auth, (request, response) => {
-  response.send("From the get");
+  response.status(200).send(request.user);
 });
 
-userRouter.post("/signin", async (request: Request, response: Response) => {
+userRouter.get("/profile/:userId", auth, (request, response) => {
+  response.send("From the get kalsjdbfjkldaslkhbsadlkjfbds");
+});
+
+// POST Routes
+
+userRouter.post("/signup", async (request: Request, response: Response) => {
   const { name, cpf, phone, birthdate, email, password } = request.body as {
     name: string;
     cpf: string;
@@ -33,8 +42,20 @@ userRouter.post("/signin", async (request: Request, response: Response) => {
   try {
     const newDate = new Date(birthdate);
 
+    const [firstName, secondName] = name.split(" ");
+    let publicId = secondName ? `${firstName}.${secondName}` : firstName;
+    
+    const generateRandomHash = () => {
+      crypto.randomBytes(4).toString("hex");
+    }
+
+    while (await prisma.users.findUnique({ where: { publicId } })) {
+      publicId = `${publicId}.${generateRandomHash()}`;
+    }
+
     const user = await prisma.users.create({
       data: {
+        publicId,
         name,
         cpf,
         phone,
@@ -76,14 +97,23 @@ userRouter.post("/login", async (request: Request, response: Response) => {
         response.cookie("token", token, { httpOnly: true});
 
       }
-
-      return response.status(200).send("Login successful");
+    
+      return response.status(200).send(user.publicId);
   } catch (error) {
+      console.log(error);
       return response.status(500).send("Error on login");
   }
 });
 
-userRouter.put("/update", auth, normalizeEmail, async (request: Request, response: Response) => {
+userRouter.post("/profile",auth, uploadFile, async (request: Request, response: Response) => {
+  console.log("Pelo User")
+  return response.status(200).send("Profile successfully updated");
+})
+
+
+// UPDATE Routes
+
+userRouter.put("/update", auth, async (request: Request, response: Response) => {
   const { name, cpf, phone, email, password } = request.body as {
       name?: string;
       cpf?: string;

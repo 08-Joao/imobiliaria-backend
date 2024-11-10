@@ -21,7 +21,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 
-app.use("/user",normalizeEmail,userRouter);
+app.use("/api/user",normalizeEmail,userRouter);
 app.use("/test",auth,test);
 
 app.listen(3333, () => {
