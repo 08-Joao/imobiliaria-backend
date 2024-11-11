@@ -5,6 +5,8 @@ import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import auth from "../middleware/auth";
 import uploadFile from "../middleware/uploadFile";
+import { UPLOADS_DIR } from "../config/constants";
+
 
 
 const prisma = new PrismaClient();
@@ -18,8 +20,27 @@ userRouter.get("/auth", auth, (request, response) => {
   response.status(200).send(request.user);
 });
 
-userRouter.get("/profile/:userId", auth, (request, response) => {
-  response.send("From the get kalsjdbfjkldaslkhbsadlkjfbds");
+userRouter.get("/profile/:userId", auth, async (request, response) => {
+  const profileId = request.params.userId;
+  const requestedUser = await prisma.users.findUnique({ where: { publicId : profileId } });
+
+  if(!requestedUser) { 
+    return response.status(404).send("User not found");
+  }
+
+  const profilePicture = `${request.protocol}://${request.get("host")}/uploads/${requestedUser.profilePicture}`;
+  const profileBanner = `${request.protocol}://${request.get("host")}/uploads/${requestedUser.profileBanner}`;
+
+  const returnedUser = {
+    name: requestedUser.name,
+    profilePicture,
+    profileBanner,
+    role: requestedUser.role,
+    profileOwnership: requestedUser.id === request.user.id ? true : false,
+    houses: requestedUser.houses
+  }
+
+  response.send(returnedUser);
 });
 
 // POST Routes

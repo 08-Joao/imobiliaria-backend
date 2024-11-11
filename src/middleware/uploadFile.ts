@@ -5,6 +5,7 @@ import crypto from "crypto";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import fs from "fs";
+import { UPLOADS_DIR } from "../config/constants";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -28,10 +29,7 @@ function getExtension(mimetype: string): string {
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const storagePath = path.join(
-      process.env.USERPROFILE || "",
-      "localStorageMedia"
-    );
+    const storagePath = UPLOADS_DIR
     if (!fs.existsSync(storagePath)) {
       fs.mkdirSync(storagePath, { recursive: true });
     }
