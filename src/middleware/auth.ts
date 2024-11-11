@@ -20,7 +20,8 @@ async function auth(request: Request, response: Response, next: NextFunction) {
             return response.status(401).json({ message: "Unauthorized" });
         }
 
-        request.user = { id: user.id, name: user.name, role: user.role };
+        const profilePic = `${request.protocol}://${request.get("host")}/uploads/${user.profilePicture}`;
+        request.user = { id: user.id, name: user.name, role: user.role, profilePicture: profilePic };
         next(); 
     } catch (error) {
         response.clearCookie("token");
