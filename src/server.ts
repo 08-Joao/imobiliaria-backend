@@ -29,6 +29,7 @@ app.use(cookieParser());
 
 
 app.use("/api/user",normalizeEmail,userRouter);
+app.use("/api/houses",auth,userRouter)
 app.use("/uploads", express.static(UPLOADS_DIR));
 app.use("/test",auth,test);
 
