@@ -1,0 +1,7 @@
+-- CreateEnum
+CREATE TYPE "HouseStatus" AS ENUM ('SALE', 'RENT');
+
+-- AlterTable
+ALTER TABLE "Houses" ADD COLUMN     "closed" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN     "publishDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN     "status" "HouseStatus" NOT NULL DEFAULT 'SALE';
