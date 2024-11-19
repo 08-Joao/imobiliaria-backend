@@ -29,14 +29,12 @@ function getExtension(mimetype: string): string {
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const storagePath = UPLOADS_DIR
+    const storagePath = UPLOADS_DIR;
     if (!fs.existsSync(storagePath)) {
       fs.mkdirSync(storagePath, { recursive: true });
     }
-
     cb(null, storagePath);
   },
-
   filename: function (req: Request, file, cb) {
     const userId = req.user?.id;
     if (!userId) {
@@ -52,6 +50,12 @@ const storage = multer.diskStorage({
     }
 
     const uniqueName = `${userId}-${randomName}${extension}`;
+
+    if (!req.uploadedFiles) {
+      req.uploadedFiles = [];
+    }
+
+    req.uploadedFiles.push(uniqueName);
     cb(null, uniqueName);
   },
 });
@@ -62,20 +66,16 @@ function fileFilter(req: Request, file: Express.Multer.File, cb: multer.FileFilt
   const allowedImageMimeTypes = ["image/jpeg", "image/png"];
   const allowedVideoMimeTypes = ["video/mp4", "video/mpeg", "video/mov"];
 
-  // Verifica o uploadType e valida os tipos MIME permitidos
   if (uploadType === "profilePic") {
     if (allowedImageMimeTypes.includes(file.mimetype)) {
-      cb(null, true); // Permite apenas imagens
+      cb(null, true);
     } else {
-      console.log(`Arquivo de tipo não permitido para profilePic: ${file.mimetype}`);
       cb(new Error("Apenas imagens são permitidas para profilePic"));
     }
   } else {
-    // Para outros tipos de upload, permite imagens e vídeos
     if (allowedImageMimeTypes.includes(file.mimetype) || allowedVideoMimeTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      console.log(`Arquivo de tipo não permitido: ${file.mimetype}`);
       cb(new Error("Tipo de arquivo não permitido"));
     }
   }
@@ -85,33 +85,19 @@ function fileFilter(req: Request, file: Express.Multer.File, cb: multer.FileFilt
 const upload = multer({
   storage,
   fileFilter,
-  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB
-});
+  limits: { fileSize: 50 * 1024 * 1024 },
+}).fields([
+  { name: 'file', maxCount: 10 }
+]);
 
-// Função de middleware para o upload do arquivo
+// Função de middleware para o upload de arquivos e processamento dos campos
 async function uploadFile(req: Request, res: Response, next: NextFunction) {
   try {
-    const uploadType = req.headers.uploadtype;
-    
-    if (!uploadType) {
-      return res.status(400).send({ error: "Upload type not provided" });
-    }
-
-    const uploadHandler = uploadType === "profilePic"
-      ? upload.single("file")
-      : upload.array("file", 10);
-
-    uploadHandler(req, res, (err: any) => {
+    upload(req, res, (err) => {
       if (err) {
-        if (err.message === "Tipo de arquivo não permitido" || err.message === "Apenas imagens são permitidas para profilePic") {
-          console.error("Erro de tipo de arquivo:", err.message);
-          return res.status(400).send({ error: err.message });
-        }
-
         console.error(`Erro no upload: ${err.message}`);
         return res.status(400).send({ error: err.message });
       }
-
       next();
     });
   } catch (error) {
