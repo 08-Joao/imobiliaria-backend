@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import userRouter from "./routes/user";
 import housesRouter from "./routes/houses";
+import uploadFileRouter from "./routes/uploadFileApi";
 import  authRouter  from "./middleware/auth";
 import auth from "./middleware/auth";
 import normalizeEmail from "./middleware/normalizeEmail";
@@ -31,6 +32,7 @@ app.use(cookieParser());
 
 app.use("/api/user",normalizeEmail,userRouter);
 app.use("/api/houses",housesRouter)
+app.use("/api/upload",uploadFileRouter)
 app.use("/uploads", express.static(UPLOADS_DIR));
 app.use("/test",auth,test);
 
