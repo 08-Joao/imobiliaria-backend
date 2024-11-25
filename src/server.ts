@@ -32,7 +32,7 @@ app.use(cookieParser());
 
 app.use("/api/user",normalizeEmail,userRouter);
 app.use("/api/houses",housesRouter)
-app.use("/api/upload",uploadFileRouter)
+app.use("/api/upload",auth,uploadFileRouter)
 app.use("/uploads", express.static(UPLOADS_DIR));
 app.use("/test",auth,test);
 

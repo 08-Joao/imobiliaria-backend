@@ -91,12 +91,12 @@ userRouter.post("/signup", async (request: Request, response: Response) => {
 
     return response.status(201).send("User successfully created");
   } catch (error) {
-    console.log(error);
+    console.log("Erro ->",error);
     return response.status(500).send("Failed to create user");
   }
 });
 
-userRouter.post("/login", async (request: Request, response: Response) => {
+userRouter.post("/signin", async (request: Request, response: Response) => {
   const { email, password, rememberMe } = request.body;
 
   if (!email || !password) {
@@ -121,13 +121,11 @@ userRouter.post("/login", async (request: Request, response: Response) => {
     
       return response.status(200).send(user.publicId);
   } catch (error) {
-      console.log(error);
-      return response.status(500).send("Error on login");
+      return response.status(500).send("Error on signin");
   }
 });
 
 userRouter.post("/profile",auth, uploadFile, async (request: Request, response: Response) => {
-  console.log("Pelo User")
   return response.status(200).send("Profile successfully updated");
 })
 

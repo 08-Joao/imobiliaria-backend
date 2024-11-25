@@ -51,11 +51,11 @@ const storage = multer.diskStorage({
 
     const uniqueName = `${userId}-${randomName}${extension}`;
 
-    if (!req.uploadedFiles) {
-      req.uploadedFiles = [];
-    }
 
-    req.uploadedFiles.push(uniqueName);
+      req.uploadedFile = uniqueName;
+
+
+    // req.uploadedFiles.push(uniqueName);
     cb(null, uniqueName);
   },
 });
