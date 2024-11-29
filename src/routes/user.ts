@@ -121,6 +121,7 @@ userRouter.post("/signin", async (request: Request, response: Response) => {
     
       return response.status(200).send(user.publicId);
   } catch (error) {
+    console.log("Deu erro", error)
       return response.status(500).send("Error on signin");
   }
 });

@@ -26,8 +26,8 @@ model Users {
   birthdate      DateTime?
   profilePicture String    @default("defaultPicture.jpg")
   profileBanner  String    @default("defaultBanner.jpg")
-  favorites      Houses[]   @relation("UserFavorites")
-  houses         Houses[]   @relation("UserHouses")
+  favorites      Int[]
+  houses         Int[]
 }
 
 model Houses {
@@ -45,10 +45,7 @@ model Houses {
   ownership   String
   publishDate DateTime    @default(now())
   closed      Boolean     @default(false)
-  owner       Users?      @relation("UserHouses", fields: [ownership], references: [id])
-  favoritedBy Users[]     @relation("UserFavorites")
 }
-
 
 enum HouseStatus {
   SALE
