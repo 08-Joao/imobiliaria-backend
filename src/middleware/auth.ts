@@ -8,6 +8,7 @@ const prisma = new PrismaClient();
 async function auth(request: Request, response: Response, next: NextFunction) {
     const token = request.cookies.token;
     if (!token) {
+        console.log("HERE")
         return response.status(401).json({ message: "Unauthorized" });
     }
 
@@ -19,7 +20,7 @@ async function auth(request: Request, response: Response, next: NextFunction) {
         if (!user || user.tokenVersion !== decoded.tokenVersion) {
             return response.status(401).json({ message: "Unauthorized" });
         }
-
+        
         const profilePic = `${request.protocol}://${request.get("host")}/uploads/${user.profilePicture}`;
         request.user = { id: user.id, name: user.name, role: user.role, profilePicture: profilePic };
         next(); 

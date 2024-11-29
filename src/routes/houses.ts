@@ -23,13 +23,22 @@ userRouter.get("/:houseId", (request, response) => {
 
 // POST ROUTES
 
-userRouter.post("/createHouse", auth, checkRole, (request, response) => {
-  
-    // Obtendo os dados da casa
-    const houseInfo = request.body
-    console.log("Informações da casa:", houseInfo);
-
-  
+userRouter.post("/createHouse", auth, checkRole, async (request, response) => {
+    const { status, price, address, description, area, suites, bathrooms, garages, media } = request.body;
+    
+    const house = await prisma.houses.create({
+        data: {
+            status,
+            price,
+            address,
+            description,
+            area,
+            suites,
+            bathrooms,
+            garages,
+            media
+        }
+    })
   
     response.status(200).send("Casa criada com sucesso!");
   });
